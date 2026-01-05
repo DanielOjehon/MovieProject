@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MovieProject.ViewModel
 {
-    internal class MovieDetailsViewModel:BaseViewModel
+    internal class MovieDetailsViemodel:BaseViewModel
     {
     }
 }
