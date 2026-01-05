@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MovieProject.ViewModel
 {
-    internal class BaseViewModel : INotifyPropertyChanged
+    public class BaseViewModel : INotifyPropertyChanged
     {
         bool isBusy;
         string title;
