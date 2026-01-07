@@ -3,30 +3,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:model="clr-namespace:MovieProject.Model"
              x:Class="MovieProject.MainPage"
-             Title="{Binding Title}"
+             Title="Movies"
              >
-            
 
 
-    <Grid  ColumnDefinitions="*,*"
-            ColumnSpacing="5"
-           RowDefinitions="*,Auto"
-           RowSpacing="0"
-           >
-        <CollectionView BackgroundColor="Blue"
-                        Grid.ColumnSpan="2"
-                        ItemsSource="{Binding Movie}"
-                        SelectionMode="None"
-                        IsVisible="{Binding IsNotBusy}">
-             
+    <Grid>
+        <SearchBar
+            Grid.Row="0"
+            Placeholder="Search for a title or a genre"
+            TextChanged="OnSearchBarTextChanged"/>
+
+        <CollectionView
+            Grid.Row="1"
+    x:Name="MoviesCollectionView"
+    ItemsSource="{Binding Movies}"
+    SelectionMode="Single"
+    SelectionChanged="OnMovieSelected">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:Movie">
-                    <Grid Padding="10">
-                        
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
+                <DataTemplate>
+    <Border
+        Margin="5"
+        Padding="12"
+        StrokeShape="RoundRectangle 12"
+        StrokeThickness="1">
 
+        <Border.Shadow>
+            <Shadow Offset="2,2" Radius="6" Opacity="0.25"/>
+        </Border.Shadow>
+
+        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+
+            <Label Text="{Binding Emoji}"
+                   FontSize="36"
+                   VerticalOptions="Center"/>
+
+            <VerticalStackLayout WidthRequest="220">
+                <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="18"/>
+                <Label Text="{Binding Year}" FontSize="14" TextColor="Gray"/>
+                <Label Text="{Binding GenreString}" FontSize="12" TextColor="Gray"/>
+            </VerticalStackLayout>
+
+                     <Button Text="👍"
+                    WidthRequest="40"
+                    Clicked="OnFavouriteClicked"
+                    BindingContext="{Binding .}"/>
+        </HorizontalStackLayout>
+    </Border>
+</DataTemplate>
+            </CollectionView.ItemTemplate>
         </CollectionView>
+            
     </Grid>
+  
 </ContentPage>
