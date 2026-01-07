@@ -7,9 +7,11 @@
     Shell.FlyoutBehavior="Flyout"
     Title="MovieProject">
 
-    <ShellContent
+    <TabBar>
+        <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
-
+       
+    </TabBar>
 </Shell>

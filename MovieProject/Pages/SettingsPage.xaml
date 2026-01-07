@@ -20,11 +20,7 @@
             Maximum="30"
             ValueChanged="OnFontSizeChanged"/>
 
-        <Label Text="Time Limit (minutes)"/>
-        <Slider
-            Minimum="0"
-            Maximum="120"
-            ValueChanged="OnTimeLimitChanged"/>
+       
 
     </VerticalStackLayout>
 </ContentPage>

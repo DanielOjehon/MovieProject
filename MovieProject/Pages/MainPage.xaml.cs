@@ -54,5 +54,12 @@ namespace MovieProject
         {
             await Navigation.PushAsync(new FavouritesPage(_favourites));
         }
+
+        private async void GoToSettingsPage(object sender, EventArgs e)
+        {
+            
+            await Navigation.PushAsync(new SettingsPage());
+        }
+
     }
 }

@@ -20,5 +20,5 @@ public partial class FavouritesPage : ContentPage
 
             ((CollectionView)sender).SelectedItem = null;
         }
-    }
+    } 
 }
