@@ -1,13 +1,36 @@
 using MovieProject.Model;
-using MovieProject.Pages;
+using Microsoft.Maui.Storage;
+using System.Text.Json;
 
 namespace MovieProject.Pages;
 
 public partial class FavouritesPage : ContentPage
 {
-    public FavouritesPage(List<Movie> favourites)
+    public FavouritesPage()
     {
         InitializeComponent();
+        LoadFavourites();
+    }
+
+    private void LoadFavourites()
+    {
+        var favJson = Preferences.Get("favourites", "");
+        var favIds = string.IsNullOrEmpty(favJson)
+            ? new List<string>()
+            : JsonSerializer.Deserialize<List<string>>(favJson) ?? new List<string>();
+
+        var cachePath = Path.Combine(FileSystem.AppDataDirectory, "movies_cache.json");
+
+        if (!File.Exists(cachePath))
+            return;
+
+        var json = File.ReadAllText(cachePath);
+        var movies = JsonSerializer.Deserialize<List<Movie>>(json) ?? new List<Movie>();
+
+        var favourites = movies
+            .Where(m => favIds.Contains(m.Id))
+            .ToList();
+
         FavouritesCollectionView.ItemsSource = favourites;
     }
 
@@ -20,5 +43,5 @@ public partial class FavouritesPage : ContentPage
 
             ((CollectionView)sender).SelectedItem = null;
         }
-    } 
+    }
 }

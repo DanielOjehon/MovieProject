@@ -71,6 +71,9 @@
 	  <Compile Update="Pages\MovieDetailPage.xaml.cs">
 	    <DependentUpon>MovieDetailPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\LoginPage.xaml.cs">
+	    <DependentUpon>LoginPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\SettingsPage.xaml.cs">
 	    <DependentUpon>SettingsPage.xaml</DependentUpon>
 	  </Compile>
@@ -81,6 +84,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\MovieDetailPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\SettingsPage.xaml">

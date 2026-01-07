@@ -1,20 +1,19 @@
 ﻿using MovieProject.Model;
-using System;
-using System.Collections.Generic;
+using Microsoft.Maui.Storage;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace MovieProject.ViewModel
 {
     public class MovieViewModels
     {
-        private const string MoviesUrl = "https://raw.githubusercontent.com/DonH-ITS/jsonfiles/refs/heads/main/moviesemoji.json";
+        private const string MoviesUrl =
+            "https://raw.githubusercontent.com/DonH-ITS/jsonfiles/refs/heads/main/moviesemoji.json";
+
         private const string CacheFileName = "movies_cache.json";
+        private const string FavouritesKey = "favourites";
 
         public ObservableCollection<Movie> Movies { get; } = new();
 
@@ -25,26 +24,24 @@ namespace MovieProject.ViewModel
 
         private async void LoadMoviesAsync()
         {
-            List<Movie> movies = null;
-
+            List<Movie>? movies = null;
             string cachePath = Path.Combine(FileSystem.AppDataDirectory, CacheFileName);
 
-            // 1️⃣ Try reading from cache
+            
             if (File.Exists(cachePath))
             {
                 try
                 {
                     var json = await File.ReadAllTextAsync(cachePath);
-                    movies = System.Text.Json.JsonSerializer.Deserialize<List<Movie>>(json);
+                    movies = JsonSerializer.Deserialize<List<Movie>>(json);
                 }
                 catch
                 {
-                   
                     movies = null;
                 }
             }
 
-           
+            
             if (movies == null)
             {
                 try
@@ -54,14 +51,12 @@ namespace MovieProject.ViewModel
 
                     if (movies != null)
                     {
-                        
-                        var json = System.Text.Json.JsonSerializer.Serialize(movies);
+                        var json = JsonSerializer.Serialize(movies);
                         await File.WriteAllTextAsync(cachePath, json);
                     }
                 }
                 catch
                 {
-                   
                     movies = new List<Movie>();
                 }
             }
@@ -69,9 +64,19 @@ namespace MovieProject.ViewModel
             if (movies == null) return;
 
             
-            foreach (var m in movies)
-                m.GenreString = string.Join(", ", m.Genre);
+            var favJson = Preferences.Get(FavouritesKey, "");
+            var favouriteIds = string.IsNullOrEmpty(favJson)
+                ? new List<string>()
+                : JsonSerializer.Deserialize<List<string>>(favJson) ?? new List<string>();
 
+            
+            foreach (var movie in movies)
+            {
+                movie.GenreString = string.Join(", ", movie.Genre);
+                movie.IsFavorite = favouriteIds.Contains(movie.Id);
+            }
+
+            
             Movies.Clear();
             foreach (var movie in movies)
                 Movies.Add(movie);

@@ -17,6 +17,12 @@ namespace MovieProject.Pages
         {
         }
 
-       
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            Preferences.Clear();
+            await Shell.Current.GoToAsync("//Login");
+        }
+
+
     }
 }

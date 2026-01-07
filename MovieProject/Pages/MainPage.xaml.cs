@@ -1,87 +1,84 @@
 ﻿using MovieProject.Model;
-using MovieProject.Pages;
 using MovieProject.ViewModel;
-namespace MovieProject
+using Microsoft.Maui.Storage;
+using MovieProject.Pages;
+
+namespace MovieProject;
+
+public partial class MainPage : ContentPage
 {
+    private MovieViewModels _viewModel;
+    private List<Movie> _favourites = new();
 
-    public partial class MainPage : ContentPage
+    public MainPage()
     {
-        private MovieViewModels _viewModel;
-        private List<Movie> _favourites = new();
+        InitializeComponent();
+        _viewModel = new MovieViewModels();
+        BindingContext = _viewModel;
 
-        public MainPage()
+        _favourites = _viewModel.Movies.Where(m => m.IsFavorite).ToList();
+    }
+
+    private async void OnMovieSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is Movie movie)
         {
-            InitializeComponent();
-            _viewModel = new MovieViewModels();
-            BindingContext = _viewModel;
+            await Shell.Current.GoToAsync(nameof(MovieDetailPage),
+                new Dictionary<string, object> { { "movie", movie } });
+
+            ((CollectionView)sender).SelectedItem = null;
         }
+    }
 
-        private async void OnMovieSelected(object sender, SelectionChangedEventArgs e)
+    private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+    {
+        var keyword = e.NewTextValue?.ToLower() ?? "";
+
+        MoviesCollectionView.ItemsSource = _viewModel.Movies
+            .Where(m =>
+                m.Title.ToLower().Contains(keyword) ||
+                m.Genre.Any(g => g.ToLower().Contains(keyword)) ||
+                (!string.IsNullOrEmpty(m.Director) &&
+                 m.Director.ToLower().Contains(keyword)))
+            .ToList();
+    }
+
+    private async void OnFavouriteClicked(object sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.BindingContext is Movie movie)
         {
-            if (e.CurrentSelection.FirstOrDefault() is Movie movie)
+            movie.IsFavorite = !movie.IsFavorite;
+
+            if (movie.IsFavorite)
+                _favourites.Add(movie);
+            else
+                _favourites.Remove(movie);
+
+            SaveFavourites();
+            btn.Text = movie.IsFavorite ? "♥" : "♡";
+
+            if (movie.IsFavorite && btn.Parent is HorizontalStackLayout hStack)
             {
-                await Shell.Current.GoToAsync(nameof(MovieDetailPage),
-                    new Dictionary<string, object> { { "movie", movie } });
-
-                ((CollectionView)sender).SelectedItem = null;
-            }
-        }
-
-        private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
-        {
-            var keyword = e.NewTextValue?.ToLower() ?? "";
-
-            MoviesCollectionView.ItemsSource = _viewModel.Movies
-                .Where(m =>
-                    m.Title.ToLower().Contains(keyword) ||          
-                    m.Genre.Any(g => g.ToLower().Contains(keyword)) || 
-                    (!string.IsNullOrEmpty(m.Director) && m.Director.ToLower().Contains(keyword)) 
-                )
-                .ToList();
-        }
-
-        private async void OnFavouriteClicked(object sender, EventArgs e)
-        {
-            if (sender is Button btn && btn.BindingContext is Movie movie)
-            {
-                movie.IsFavorite = !movie.IsFavorite;
-
-                if (movie.IsFavorite && !_favourites.Contains(movie))
-                    _favourites.Add(movie);
-                else if (!movie.IsFavorite && _favourites.Contains(movie))
-                    _favourites.Remove(movie);
-
-                btn.Text = movie.IsFavorite ? "♥" : "♡";
-
-                if (movie.IsFavorite)
+                var emoji = hStack.Children.OfType<Label>().FirstOrDefault();
+                if (emoji != null)
                 {
-                    if (btn.Parent is HorizontalStackLayout hStack)
-                    {
-                        var emojiLabel = hStack.Children
-                            .OfType<Label>()
-                            .FirstOrDefault(l => l.FontSize == 36); 
-
-                        if (emojiLabel != null)
-                        {
-                            await emojiLabel.RotateTo(360, 500); 
-                            emojiLabel.Rotation = 0;
-                        }
-                    }
+                    await emoji.RotateTo(360, 500);
+                    emoji.Rotation = 0;
                 }
             }
         }
-
-
-        private async void GoToFavouritesPage(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new FavouritesPage(_favourites));
-        }
-
-        private async void GoToSettingsPage(object sender, EventArgs e)
-        {
-            
-            await Navigation.PushAsync(new SettingsPage());
-        }
-
     }
+
+    private void SaveFavourites()
+    {
+        var ids = _favourites.Select(m => m.Id).ToList();
+        var json = System.Text.Json.JsonSerializer.Serialize(ids);
+        Preferences.Set("favourites", json);
+    }
+
+    private async void GoToFavouritesPage(object sender, EventArgs e)
+        => await Shell.Current.GoToAsync(nameof(FavouritesPage));
+
+    private async void GoToSettingsPage(object sender, EventArgs e)
+        => await Shell.Current.GoToAsync(nameof(SettingsPage));
 }
