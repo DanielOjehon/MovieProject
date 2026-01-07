@@ -30,12 +30,17 @@ namespace MovieProject
         private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
         {
             var keyword = e.NewTextValue?.ToLower() ?? "";
+
             MoviesCollectionView.ItemsSource = _viewModel.Movies
-                .Where(m => m.Title.ToLower().Contains(keyword) || m.Genre.Any(g => g.ToLower().Contains(keyword)))
+                .Where(m =>
+                    m.Title.ToLower().Contains(keyword) ||          
+                    m.Genre.Any(g => g.ToLower().Contains(keyword)) || 
+                    (!string.IsNullOrEmpty(m.Director) && m.Director.ToLower().Contains(keyword)) 
+                )
                 .ToList();
         }
 
-        private void OnFavouriteClicked(object sender, EventArgs e)
+        private async void OnFavouriteClicked(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.BindingContext is Movie movie)
             {
@@ -44,11 +49,28 @@ namespace MovieProject
                 if (movie.IsFavorite && !_favourites.Contains(movie))
                     _favourites.Add(movie);
                 else if (!movie.IsFavorite && _favourites.Contains(movie))
-                   _favourites.Remove(movie);
+                    _favourites.Remove(movie);
 
                 btn.Text = movie.IsFavorite ? "♥" : "♡";
+
+                if (movie.IsFavorite)
+                {
+                    if (btn.Parent is HorizontalStackLayout hStack)
+                    {
+                        var emojiLabel = hStack.Children
+                            .OfType<Label>()
+                            .FirstOrDefault(l => l.FontSize == 36); 
+
+                        if (emojiLabel != null)
+                        {
+                            await emojiLabel.RotateTo(360, 500); 
+                            emojiLabel.Rotation = 0;
+                        }
+                    }
+                }
             }
         }
+
 
         private async void GoToFavouritesPage(object sender, EventArgs e)
         {
