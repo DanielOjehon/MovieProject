@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="MovieProject.Pages.SettingsPage"
+    Title="Settings">
+
+    <VerticalStackLayout Padding="24" Spacing="16">
+
+        <Label Text="Settings" FontSize="24" />
+
+        <HorizontalStackLayout>
+            <Label Text="Dark Mode" VerticalOptions="Center"/>
+            <Switch Toggled="OnDarkModeToggled"/>
+        </HorizontalStackLayout>
+
+        <Label Text="Font Size"/>
+        <Slider
+            Minimum="12"
+            Maximum="30"
+            ValueChanged="OnFontSizeChanged"/>
+
+        <Label Text="Time Limit (minutes)"/>
+        <Slider
+            Minimum="0"
+            Maximum="120"
+            ValueChanged="OnTimeLimitChanged"/>
+
+    </VerticalStackLayout>
+</ContentPage>
