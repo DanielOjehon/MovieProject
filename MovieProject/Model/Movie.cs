@@ -9,12 +9,10 @@ namespace MovieProject.Model
     public class Movie
     {
 
-        public string title { get; set; }
-        public int year { get; set; }
-        public List<string> genre { get; set; }
-        public string director { get; set; }
-        public double rating { get; set; }
-        public string emoji { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Emoji { get; set; } = string.Empty;
+        public int Year { get; set; }
+        
 
 
     }
